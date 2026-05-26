@@ -1,0 +1,22 @@
+{
+  "name": "Interview Trainer Agent",
+  "description": "AI-powered interview preparation platform using IBM Granite Models, LangChain, RAG, and Flask.",
+  "repository": "https://github.com/Aesthetic1541/interviewer-trainer-agent",
+  "keywords": [
+    "IBM Granite",
+    "Flask",
+    "LangChain",
+    "RAG",
+    "AI",
+    "Interview Preparation",
+    "FAISS"
+  ],
+  "env": {
+    "IBM_API_KEY": {
+      "description": "IBM watsonx.ai API Key"
+    },
+    "IBM_PROJECT_ID": {
+      "description": "IBM watsonx.ai Project ID"
+    }
+  }
+}
