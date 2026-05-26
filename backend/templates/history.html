@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>History – InterviewAI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/css/main.css"/>
+  <link rel="stylesheet" href="/static/css/history.css"/>
+</head>
+<body class="app-body">
+
+<nav class="navbar">
+  <div class="nav-brand">
+    <a href="/" style="text-decoration:none;display:flex;align-items:center;gap:8px">
+      <span class="brand-icon">⬡</span>
+      <span class="brand-name">InterviewAI</span>
+    </a>
+  </div>
+  <div class="nav-links">
+    <a href="/" class="nav-link">Home</a>
+    <a href="/dashboard" class="nav-link">Practice</a>
+    <a href="/history" class="nav-link active">History</a>
+  </div>
+</nav>
+
+<div class="history-page">
+  <div class="history-header">
+    <h1 class="history-title">Interview History</h1>
+    <p class="history-sub">Track your preparation progress across sessions</p>
+  </div>
+
+  <!-- Aggregate Stats -->
+  <div class="stats-row" id="statsRow">
+    <div class="stat-card">
+      <div class="stat-card-num" id="statTotal">–</div>
+      <div class="stat-card-label">Total Sessions</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-num" id="statCompleted">–</div>
+      <div class="stat-card-label">Completed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-num" id="statAvg">–%</div>
+      <div class="stat-card-label">Avg Score</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-num" id="statBest">–%</div>
+      <div class="stat-card-label">Best Score</div>
+    </div>
+  </div>
+
+  <!-- Sessions List -->
+  <div class="sessions-list" id="sessionsList">
+    <div class="loading-state" id="loadingState">
+      <div class="loading-spinner"></div>
+      <p>Loading sessions…</p>
+    </div>
+  </div>
+
+  <div class="empty-history hidden" id="emptyHistory">
+    <div class="eh-icon">📭</div>
+    <h3>No sessions yet</h3>
+    <p>Complete a mock interview to see your history here.</p>
+    <a href="/dashboard" class="btn-primary">Start Practicing →</a>
+  </div>
+</div>
+
+<!-- Session Detail Modal -->
+<div class="modal-overlay hidden" id="detailModal">
+  <div class="modal modal-lg">
+    <button class="modal-close" id="detailClose">✕</button>
+    <div class="modal-body" id="detailBody"></div>
+  </div>
+</div>
+
+<script src="/static/js/main.js"></script>
+<script src="/static/js/history.js"></script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Practice – InterviewAI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/css/main.css"/>
+  <link rel="stylesheet" href="/static/css/dashboard.css"/>
+</head>
+<body class="app-body">
+
+<!-- ── Nav ────────────────────────────────────────────────────────────────── -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <a href="/" style="text-decoration:none;display:flex;align-items:center;gap:8px">
+      <span class="brand-icon">⬡</span>
+      <span class="brand-name">InterviewAI</span>
+    </a>
+  </div>
+  <div class="nav-links">
+    <a href="/" class="nav-link">Home</a>
+    <a href="/dashboard" class="nav-link active">Practice</a>
+    <a href="/history" class="nav-link">History</a>
+  </div>
+  <div class="nav-status" id="llmStatus">
+    <span class="status-dot"></span>
+    <span class="status-text">Connecting…</span>
+  </div>
+</nav>
+
+<!-- ── Main Layout ─────────────────────────────────────────────────────────── -->
+<div class="app-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Session Setup</div>
+
+      <!-- Step 1: Resume Upload -->
+      <div class="sidebar-card" id="uploadCard">
+        <div class="card-step">01</div>
+        <h3 class="card-title">Upload Resume</h3>
+        <div id="dropzone" class="dropzone">
+          <div class="dz-icon">📄</div>
+          <div class="dz-text">Drop PDF here or <span class="dz-link">browse</span></div>
+          <div class="dz-sub">PDF, TXT · Max 16MB</div>
+          <input type="file" id="fileInput" accept=".pdf,.txt" hidden/>
+        </div>
+        <div id="resumeInfo" class="resume-info hidden">
+          <div class="resume-info-row">
+            <span class="ri-label">Title:</span>
+            <span class="ri-val" id="riTitle">–</span>
+          </div>
+          <div class="resume-info-row">
+            <span class="ri-label">Experience:</span>
+            <span class="ri-val" id="riExp">–</span>
+          </div>
+          <div class="resume-info-row skills-row">
+            <span class="ri-label">Skills:</span>
+            <div class="skills-tags" id="riSkills"></div>
+          </div>
+          <button class="btn-ghost btn-sm" id="clearResume">✕ Remove</button>
+        </div>
+        <div id="uploadProgress" class="upload-progress hidden">
+          <div class="progress-bar"><div class="progress-fill" id="uploadFill"></div></div>
+          <div class="progress-label" id="uploadLabel">Parsing resume…</div>
+        </div>
+      </div>
+
+      <!-- Step 2: Role & Level -->
+      <div class="sidebar-card" id="roleCard">
+        <div class="card-step">02</div>
+        <h3 class="card-title">Target Role</h3>
+        <select class="select-input" id="jobRole">
+          <option value="">Select job role…</option>
+          <option>Software Engineer</option>
+          <option>Data Scientist</option>
+          <option>Machine Learning Engineer</option>
+          <option>Frontend Developer</option>
+          <option>Backend Developer</option>
+          <option>Full Stack Developer</option>
+          <option>DevOps Engineer</option>
+          <option>Cloud Architect</option>
+          <option>Product Manager</option>
+          <option>Data Analyst</option>
+          <option>Android Developer</option>
+          <option>iOS Developer</option>
+          <option>QA Engineer</option>
+          <option>Cybersecurity Analyst</option>
+          <option>Database Administrator</option>
+        </select>
+
+        <div class="level-selector">
+          <button class="level-btn" data-level="junior">Junior</button>
+          <button class="level-btn active" data-level="mid">Mid</button>
+          <button class="level-btn" data-level="senior">Senior</button>
+        </div>
+
+        <div class="q-count-row">
+          <div class="q-count-item">
+            <label>Technical Qs</label>
+            <input type="number" id="numTech" value="5" min="3" max="10" class="num-input"/>
+          </div>
+          <div class="q-count-item">
+            <label>HR Qs</label>
+            <input type="number" id="numHR" value="5" min="3" max="10" class="num-input"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Start Button -->
+      <button class="btn-primary btn-full" id="startBtn" disabled>
+        <span id="startBtnText">Generate Interview →</span>
+        <span id="startSpinner" class="spinner hidden"></span>
+      </button>
+    </div>
+
+    <!-- Session Score (visible after session starts) -->
+    <div class="sidebar-section hidden" id="scorePanel">
+      <div class="sidebar-label">Session Score</div>
+      <div class="score-ring-wrap">
+        <svg viewBox="0 0 120 120" class="score-ring">
+          <circle class="ring-bg"   cx="60" cy="60" r="50"/>
+          <circle class="ring-fill" cx="60" cy="60" r="50" id="ringFill"/>
+        </svg>
+        <div class="score-center">
+          <span class="score-pct" id="scorePct">0%</span>
+          <span class="score-grade" id="scoreGrade">–</span>
+        </div>
+      </div>
+      <div class="score-breakdown" id="scoreBreakdown"></div>
+      <button class="btn-primary btn-full" id="finishBtn">
+        Complete &amp; See Results →
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Empty state -->
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">🎯</div>
+      <h2 class="empty-title">Ready when you are</h2>
+      <p class="empty-sub">Upload your resume and select a role to generate a personalised interview session powered by IBM Granite.</p>
+      <div class="empty-features">
+        <div class="ef-item"><span class="ef-dot"></span>Technical &amp; HR questions</div>
+        <div class="ef-item"><span class="ef-dot"></span>AI feedback on every answer</div>
+        <div class="ef-item"><span class="ef-dot"></span>Model answers &amp; tips</div>
+      </div>
+    </div>
+
+    <!-- Interview Mode Tabs (hidden until session starts) -->
+    <div class="content-panel hidden" id="contentPanel">
+      <div class="panel-header">
+        <div class="panel-title-group">
+          <h2 class="panel-title" id="panelTitle">Interview Session</h2>
+          <span class="panel-meta" id="panelMeta"></span>
+        </div>
+        <div class="mode-tabs">
+          <button class="mode-tab active" data-mode="quiz" id="tabQuiz">📝 Question Bank</button>
+          <button class="mode-tab" data-mode="chat" id="tabChat">💬 Chat Interview</button>
+        </div>
+      </div>
+
+      <!-- Quiz Mode -->
+      <div id="quizMode">
+        <div class="question-nav" id="questionNav"></div>
+        <div class="question-panel" id="questionPanel">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Chat Mode -->
+      <div id="chatMode" class="hidden">
+        <div class="chat-container">
+          <div class="chat-messages" id="chatMessages">
+            <div class="chat-welcome">
+              <div class="chat-welcome-icon">🤖</div>
+              <div class="chat-welcome-text">
+                <strong>AI Interviewer is ready.</strong><br/>
+                I'll conduct a realistic mock interview. Just respond naturally — I'll ask follow-ups, probe deeper, and give feedback at the end.
+              </div>
+            </div>
+          </div>
+          <div class="chat-input-bar">
+            <textarea
+              id="chatInput"
+              class="chat-textarea"
+              placeholder="Type your response…"
+              rows="3"
+            ></textarea>
+            <button class="chat-send-btn" id="chatSendBtn">
+              <span id="chatSendIcon">⬆</span>
+              <span id="chatSendSpinner" class="spinner hidden"></span>
+            </button>
+          </div>
+          <div class="chat-actions">
+            <button class="btn-ghost btn-sm" id="chatResetBtn">↺ Reset conversation</button>
+            <span class="chat-hint">Press Ctrl+Enter to send</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Panel (shown after completion) -->
+    <div class="results-panel hidden" id="resultsPanel">
+      <!-- Populated by JS -->
+    </div>
+
+  </main>
+</div>
+
+<!-- ── Answer Modal ──────────────────────────────────────────────────────── -->
+<div class="modal-overlay hidden" id="answerModal">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">✕</button>
+    <div class="modal-body" id="modalBody">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/main.js"></script>
+<script src="/static/js/dashboard.js"></script>
+</body>
+</html>
